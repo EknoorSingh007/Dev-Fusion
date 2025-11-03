@@ -62,7 +62,11 @@ const FilterSidebar = ({ filters, onFiltersChange, onClearFilters }) => {
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-80'}`}>
+    <div 
+        className={`bg-white border-r border-gray-200 transition-all duration-300 
+                   sticky top-16 h-[calc(100vh-64px)] overflow-y-auto z-10 
+                   ${isCollapsed ? 'w-16' : 'w-80'}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
