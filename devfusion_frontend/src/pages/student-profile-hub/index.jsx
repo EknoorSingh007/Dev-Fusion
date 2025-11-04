@@ -16,7 +16,7 @@ import { setUser } from '../../redux/authSlice';
 const StudentProfileHub = () => {
   const [activeTab, setActiveTab] = useState('projects');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   const [profileData, setProfileData] = useState(null); 
   const [loading, setLoading] = useState(true);
@@ -73,19 +73,15 @@ const StudentProfileHub = () => {
     const token = localStorage.getItem('authToken');
 
     try {
-      // We must also update the User model for fields like name/email
       const userUpdateData = {
         first_name: formData.name.split(' ')[0],
         last_name: formData.name.split(' ').slice(1).join(' '),
       };
       
-      // Update the main User model (this is just for name consistency)
-      // Note: We're sending this to the profile endpoint, which will update the user
       await axios.patch('http://127.0.0.1:8000/api/profile/', userUpdateData, {
          headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      // Update the Profile model
       const response = await axios.patch('http://127.0.0.1:8000/api/profile/', formData, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -93,7 +89,7 @@ const StudentProfileHub = () => {
       });
       
       setProfileData(response.data);
-      dispatch(setUser(response.data)); // Update Redux store with new data
+      dispatch(setUser(response.data)); 
       setIsEditMode(false);
     } catch (err) {
       console.error("Save profile error:", err);
@@ -109,7 +105,6 @@ const StudentProfileHub = () => {
   
   // --- Render States ---
 
-  // 1. Loading State
   if (loading && !profileData) { 
     return (
       <div className="flex h-screen items-center justify-center">
@@ -118,7 +113,6 @@ const StudentProfileHub = () => {
     );
   }
 
-  // 2. Error State
   if (error) {
      return (
       <div className="flex h-screen items-center justify-center">
@@ -127,7 +121,6 @@ const StudentProfileHub = () => {
     );
   }
   
-  // 3. Success State (profileData exists)
   return (
     <div className="min-h-screen bg-background">
       <Sidebar
@@ -183,7 +176,6 @@ const StudentProfileHub = () => {
               <div className="space-y-8">
                 {activeTab === 'projects' && (
                   <ProjectPortfolio
-                    // 🟢 USE THE REAL PROJECT DATA FROM THE PROFILE
                     projects={profileData?.projects || []} 
                     onViewProject={() => {}}
                     onAddProject={() => {}}
@@ -205,14 +197,14 @@ const StudentProfileHub = () => {
                 )}
                 {activeTab === 'endorsements' && (
                   <PeerEndorsements
-                    endorsements={[]} // TODO: Replace with real data when API is ready
-                    testimonials={[]} // TODO: Replace with real data when API isB ready
+                    endorsements={[]} // TODO
+                    testimonials={[]} // TODO
                     onWriteTestimonial={() => {}}
                   />
                 )}
                 {activeTab === 'activity' && (
                   <ActivityFeed
-                    activities={[]} // TODO: Replace with real data when API is ready
+                    activities={[]} // TODO
                     onLoadMore={() => {}}
                   />
                 )}

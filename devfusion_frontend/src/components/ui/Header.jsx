@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-// 🟢 1. Import useNavigate
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import Button from './Button';
-// 🟢 2. Import useDispatch and the logout action
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/authSlice'; 
 
@@ -11,28 +9,33 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  // 🟢 3. Get Redux state and hooks
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn); 
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 🟢 4. Create the handleLogout function
   const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
-    setIsMobileMenuOpen(false); // Close mobile menu if open
-    navigate('/login'); // Redirect to the login page
+    dispatch(logout()); 
+    setIsMobileMenuOpen(false);
+    navigate('/login'); 
   };
 
-  // The rest of this logic now works automatically
   const profileAction = isLoggedIn 
     ? { name: 'Profile', path: '/student-profile-hub', icon: 'User', variant: 'outline', className: 'text-gray-700' }
     : { name: 'Sign In', path: '/login', icon: 'LogIn', variant: 'primary', className: 'bg-primary text-white hover:bg-primary/90' };
 
-
+  
   const navigationItems = [
     { name: 'Discover', path: '/discovery-dashboard', icon: 'Search' },
-    { name: 'Create', path: '/project-creation-studio', icon: 'Plus' },
-    { name: 'Workspace', path: '/collaboration-workspace', icon: 'Users' },
+    { 
+      name: 'Create', 
+      path: isLoggedIn ? '/project-creation-studio' : '/register', 
+      icon: 'Plus' 
+    },
+    { 
+      name: 'Workspace', 
+      path: isLoggedIn ? '/collaboration-workspace' : '/register', 
+      icon: 'Users' 
+    },
   ];
 
   const secondaryItems = [
@@ -78,11 +81,12 @@ const Header = () => {
           </div>
         </Link>
 
-        {/* Desktop Navigation (No Change) */}
+        {/* Desktop Navigation (Now uses the updated paths) */}
         <nav className="hidden lg:flex items-center space-x-1">
           {navigationItems?.map((item) => (
             <Link
-              key={item?.path}
+              // 🟢 THE FIX: Use the stable 'name' as the key
+              key={item?.name}
               to={item?.path}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActivePath(item?.path)
@@ -96,7 +100,7 @@ const Header = () => {
           ))}
           {isLoggedIn && (
               <Link
-                key="/student-profile-hub"
+                key="/student-profile-hub" // This key is stable, so it's fine
                 to="/student-profile-hub"
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActivePath('/student-profile-hub')
@@ -110,7 +114,7 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Desktop Actions (MODIFIED) */}
+        {/* Desktop Actions (Logout button is already here) */}
         <div className="hidden lg:flex items-center space-x-3">
           <div className="relative group">
             <Button
@@ -134,7 +138,6 @@ const Header = () => {
                   </Link>
                 ))}
                 
-                {/* 🟢 5. Add Logout Button to Dropdown */}
                 {isLoggedIn && (
                   <>
                     <div className="my-1 h-px bg-gray-200" /> 
@@ -151,7 +154,7 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Profile/Login Actions (This logic is now fully functional) */}
+          {/* Profile/Login Actions (This logic is correct) */}
           <div className="flex items-center space-x-2 pl-3 border-l border-gray-200">
             {isLoggedIn && (
                 <Button
@@ -186,13 +189,14 @@ const Header = () => {
         />
       </div>
       
-      {/* Mobile Navigation (MODIFIED) */}
+      {/* Mobile Navigation (Now uses the updated paths) */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-200 shadow-brand-lg">
           <div className="px-4 py-4 space-y-2">
             {navigationItems?.map((item) => (
               <Link
-                key={item?.path}
+                // 🟢 THE FIX: Use the stable 'name' as the key
+                key={item?.name}
                 to={item?.path}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -219,7 +223,6 @@ const Header = () => {
                   </Link>
                 ))}
                 
-                {/* 🟢 6. Add Logout Button to Mobile Menu */}
                 {isLoggedIn && (
                   <button
                     onClick={handleLogout}

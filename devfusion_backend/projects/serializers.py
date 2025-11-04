@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import Project, TeamRequirement, ProjectMember
 from users.models import Skill
-from users.serializers import SkillSerializer # We'll re-use the SkillSerializer
+# We can safely import this serializer because users/serializers.py does not import from this file
+from users.serializers import SkillSerializer 
 from django.contrib.auth.models import User
 
 # --- Serializer for Project Members ---
@@ -30,17 +31,13 @@ class ProjectSerializer(serializers.ModelSerializer):
     team_requirements = TeamRequirementSerializer(many=True, read_only=True)
     members = ProjectMemberSerializer(many=True, read_only=True)
 
-    # For writing (POST/PUT requests), we just want the IDs.
-    # This allows your React app to send just a list of skill IDs: [1, 2, 5]
-    technology_ids = serializers.PrimaryKeyRelatedField(
-        many=True, 
-        write_only=True, 
-        queryset=Skill.objects.all(), 
-        source='technologies'
+    # For writing (POST requests), we accept a simple list of names
+    technology_names = serializers.ListField(
+        child=serializers.CharField(max_length=100),
+        write_only=True,
+        required=False # Make it optional
     )
     
-    # We'll handle creating team requirements in the view
-
     class Meta:
         model = Project
         fields = [
@@ -51,28 +48,22 @@ class ProjectSerializer(serializers.ModelSerializer):
             'meetingFrequency', 'timezone', 'repositoryName', 'created_at', 
             
             # Nested/Write-only fields
-            'technologies', # For reading
-            'technology_ids', # For writing
+            'technologies',      # For reading
+            'technology_names',  # For writing
             'team_requirements', # For reading
-            'members' # For reading
+            'members'            # For reading
         ]
         read_only_fields = ['owner', 'created_at', 'updated_at', 'members']
 
     def create(self, validated_data):
-        # When a project is created, 'owner' isn't in the form data,
-        # so we get it from the 'context' (which we will pass from the view)
-        validated_data['owner'] = self.context['request'].user
-        
-        # Pop the 'technology_ids' data before creating the project
-        technologies_data = validated_data.pop('technologies', None)
+        # We manually handle 'technology_names' and 'team_requirements'
+        # so we pop them from the data before creating the project
+        validated_data.pop('team_requirements', [])
+        validated_data.pop('technology_names', [])
         
         # Create the project instance
         project = Project.objects.create(**validated_data)
-
-        # Set the technologies
-        if technologies_data:
-            project.technologies.set(technologies_data)
-            
+        
         # Add the owner as the first member with the 'lead' role
         ProjectMember.objects.create(project=project, user=project.owner, role='lead')
 

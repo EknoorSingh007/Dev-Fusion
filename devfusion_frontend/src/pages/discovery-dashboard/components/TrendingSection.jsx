@@ -4,74 +4,76 @@ import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
 const TrendingSection = () => {
+  // ----- 🟢 UPDATED MOCK DATA 🟢 -----
   const trendingProjects = [
   {
     id: 1,
-    title: "Blockchain Voting System",
-    creator: "Alex Thompson",
-    institution: "Stanford University",
-    image: "https://images.unsplash.com/photo-1631864032976-cef7f00fea43",
-    imageAlt: "Digital voting interface on tablet with blockchain network visualization in background",
-    skills: ["Blockchain", "Solidity", "React"],
+    title: "UPI-Based Campus Payment System",
+    creator: "Aditi Rao",
+    institution: "IIT Madras",
+    image: "https://www.shutterstock.com/image-photo/madhubani-bihar-india-august-05-260nw-2022415778.jpg",
+    imageAlt: "Smartphone showing a UPI transaction QR code",
+    skills: ["FinTech", "UPI API", "React Native"],
     teamSize: 4,
     trending: "+45%",
-    category: "Blockchain"
+    category: "FinTech"
   },
   {
     id: 2,
-    title: "AR Museum Experience",
-    creator: "Emma Wilson",
-    institution: "MIT",
-    image: "https://images.unsplash.com/photo-1568678712969-21afe1912701",
-    imageAlt: "Person wearing AR headset viewing virtual museum artifacts in modern gallery space",
-    skills: ["Unity", "C#", "ARKit"],
+    title: "Agri-Tech Drone Monitoring",
+    creator: "Rohan Varma",
+    institution: "NIT Warangal",
+    image: "https://images.unsplash.com/photo-1596818776983-a7a7e478d492?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
+    imageAlt: "Drone flying over a green agricultural field",
+    skills: ["IoT", "Python", "OpenCV"],
     teamSize: 6,
     trending: "+38%",
-    category: "AR/VR"
+    category: "Agri-Tech"
   },
   {
     id: 3,
-    title: "Smart Agriculture IoT",
-    creator: "David Kim",
-    institution: "UC Berkeley",
-    image: "https://images.unsplash.com/photo-1596818776983-a7a7e478d492",
-    imageAlt: "Automated farming system with sensors monitoring crop growth in greenhouse environment",
-    skills: ["IoT", "Python", "Machine Learning"],
+    title: "Hyperlocal E-Waste Collection",
+    creator: "Siddharth Jain",
+    institution: "IIT Delhi",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2PuxbTtM5Zh_1uRwhLaMOnDIbcZYzZXow4Q&s",
+    imageAlt: "Pile of electronic waste like old keyboards and phones",
+    skills: ["React", "Node.js", "Logistics"],
     teamSize: 5,
     trending: "+32%",
-    category: "IoT"
+    category: "Sustainability"
   },
   {
     id: 4,
-    title: "Mental Health Analytics",
-    creator: "Lisa Rodriguez",
-    institution: "Harvard University",
-    image: "https://images.unsplash.com/photo-1599045118108-bf9954418b76",
-    imageAlt: "Healthcare professional analyzing mental health data charts on multiple computer screens",
-    skills: ["Data Science", "R", "Psychology"],
+    title: "AI-Powered Mental Wellness App",
+    creator: "Meera Krishnan",
+    institution: "BITS Pilani",
+    image: "https://images.unsplash.com/photo-1599045118108-bf9954418b76?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
+    imageAlt: "Person meditating using a smartphone app interface",
+    skills: ["NLP", "React Native", "Firebase"],
     teamSize: 7,
     trending: "+28%",
-    category: "Healthcare"
+    category: "HealthTech"
   }];
 
 
   const trendingSkills = [
   { name: "Machine Learning", growth: "+52%", projects: 127, color: "bg-primary" },
   { name: "React Native", growth: "+41%", projects: 89, color: "bg-secondary" },
-  { name: "Blockchain", growth: "+38%", projects: 64, color: "bg-accent" },
+  { name: "Python (Django/Flask)", growth: "+38%", projects: 112, color: "bg-accent" },
   { name: "Data Science", growth: "+35%", projects: 156, color: "bg-success" },
-  { name: "UI/UX Design", growth: "+29%", projects: 203, color: "bg-warning" },
-  { name: "DevOps", growth: "+24%", projects: 78, color: "bg-error" }];
+  { name: "Cloud (AWS/Azure)", growth: "+29%", projects: 203, color: "bg-warning" },
+  { name: "Blockchain", growth: "+24%", projects: 78, color: "bg-error" }];
 
 
   const trendingCategories = [
-  { name: "AI & Machine Learning", count: 45, icon: "Brain", color: "text-primary" },
-  { name: "Web Development", count: 38, icon: "Globe", color: "text-secondary" },
-  { name: "Mobile Apps", count: 32, icon: "Smartphone", color: "text-accent" },
-  { name: "Data Science", count: 28, icon: "BarChart3", color: "text-success" },
-  { name: "Blockchain", count: 24, icon: "Link", color: "text-warning" },
-  { name: "IoT & Hardware", count: 19, icon: "Cpu", color: "text-error" }];
+  { name: "FinTech & UPI", count: 45, icon: "Wallet", color: "text-primary" },
+  { name: "EdTech", count: 38, icon: "BookOpen", color: "text-secondary" },
+  { name: "HealthTech", count: 32, icon: "Heart", color: "text-accent" },
+  { name: "SaaS", count: 28, icon: "Cloud", color: "text-success" },
+  { name: "Agri-Tech", count: 24, icon: "Leaf", color: "text-warning" },
+  { name: "E-Commerce", count: 19, icon: "ShoppingCart", color: "text-error" }];
 
+  // ------------------------------------
 
   return (
     <div className="space-y-8">
@@ -152,6 +154,7 @@ const TrendingSection = () => {
           )}
         </div>
       </div>
+      
       {/* Trending Skills & Categories */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Trending Skills */}
@@ -215,7 +218,6 @@ const TrendingSection = () => {
         </div>
       </div>
     </div>);
-
 };
 
 export default TrendingSection;

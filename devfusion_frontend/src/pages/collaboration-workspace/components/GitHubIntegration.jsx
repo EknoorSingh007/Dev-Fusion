@@ -1,311 +1,124 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
 
 const GitHubIntegration = ({ repository, commits, pullRequests, onConnectRepo }) => {
-  const [showConnectForm, setShowConnectForm] = useState(false);
-  const [repoUrl, setRepoUrl] = useState('');
-  const [activeTab, setActiveTab] = useState('commits');
-
-  const handleConnectRepo = () => {
-    if (repoUrl?.trim()) {
-      onConnectRepo(repoUrl);
-      setRepoUrl('');
-      setShowConnectForm(false);
-    }
-  };
 
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
-    const time = new Date(timestamp);
-    const diffInHours = Math.floor((now - time) / (1000 * 60 * 60));
+    const activityTime = new Date(timestamp);
+    const diffInMinutes = Math.floor((now - activityTime) / (1000 * 60));
     
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    return `${Math.floor(diffInHours / 24)}d ago`;
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
-  const tabs = [
-    { id: 'commits', label: 'Recent Commits', icon: 'GitCommit' },
-    { id: 'pulls', label: 'Pull Requests', icon: 'GitPullRequest' },
-    { id: 'issues', label: 'Issues', icon: 'AlertCircle' }
-  ];
+  const getPRStatusClasses = (status) => {
+    switch (status) {
+      case 'open': return 'bg-success/10 text-success';
+      case 'merged': return 'bg-secondary/10 text-secondary';
+      case 'closed': return 'bg-destructive/10 text-destructive';
+      default: return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  const getPRIcon = (status) => {
+    switch (status) {
+      case 'open': return 'GitPullRequest';
+      case 'merged': return 'GitMerge';
+      case 'closed': return 'GitPullRequestClosed';
+      default: return 'GitPullRequest';
+    }
+  };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
-            <Icon name="Github" size={20} className="text-white" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">GitHub Integration</h3>
-        </div>
-        
-        {!repository && (
-          <Button
-            variant="default"
-            size="sm"
-            iconName="Plus"
-            onClick={() => setShowConnectForm(true)}
-          >
-            Connect Repository
-          </Button>
-        )}
-      </div>
-      {/* Connect Repository Form */}
-      {showConnectForm && (
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-4">Connect GitHub Repository</h4>
+    <div className="bg-white rounded-xl shadow-brand border border-gray-200">
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Input
-              type="url"
-              placeholder="https://github.com/username/repository"
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e?.target?.value)}
-              className="flex-1"
-            />
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleConnectRepo}
-            >
-              Connect
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowConnectForm(false)}
-            >
-              Cancel
-            </Button>
+            <Icon name="Github" size={24} className="text-gray-900" />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">GitHub Integration</h2>
+              <p className="text-sm text-gray-600">Sync with your team's repository</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" iconName="RefreshCw">
+            Sync Now
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-6">
+        {/* Repository Details */}
+        <div className="border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <a href={repository.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary hover:underline flex items-center">
+              {repository.name}
+              <Icon name="ExternalLink" size={14} className="ml-1.5" />
+            </a>
+            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full flex items-center">
+              <Icon name="GitBranch" size={14} className="mr-1" />
+              {repository.branch}
+            </span>
+          </div>
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <div className="flex items-center space-x-1">
+              <Icon name="Star" size={14} />
+              <span>{repository.stars} Stars</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Icon name="GitFork" size={14} />
+              <span>{repository.forks} Forks</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Icon name="Clock" size={14} />
+              <span>Last sync: {formatTimeAgo(repository.lastSync)}</span>
+            </div>
           </div>
         </div>
-      )}
-      {repository ? (
-        <>
-          {/* Repository Info */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Icon name="GitBranch" size={20} className="text-gray-600" />
-                <div>
-                  <div className="text-sm font-medium text-gray-900">{repository?.name}</div>
-                  <div className="text-xs text-gray-500">{repository?.url}</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>{repository?.branch}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Icon name="Star" size={14} />
-                  <span>{repository?.stars}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Icon name="GitFork" size={14} />
-                  <span>{repository?.forks}</span>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Tabs */}
-          <div className="flex items-center space-x-1 mb-6 border-b border-gray-200">
-            {tabs?.map((tab) => (
-              <button
-                key={tab?.id}
-                onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === tab?.id
-                    ? 'text-primary border-b-2 border-primary' :'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Icon name={tab?.icon} size={16} />
-                <span>{tab?.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Commits Tab */}
-          {activeTab === 'commits' && (
+        {/* Commits and PRs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Recent Commits */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Commits</h3>
             <div className="space-y-3">
-              {commits?.map((commit) => (
-                <div key={commit?.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Icon name="GitCommit" size={16} className="text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 mb-1">{commit?.message}</div>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span>{commit?.author}</span>
-                      <span>{commit?.sha?.substring(0, 7)}</span>
-                      <span>{formatTimeAgo(commit?.timestamp)}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-green-600">+{commit?.additions}</span>
-                    <span className="text-xs text-red-600">-{commit?.deletions}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      iconName="ExternalLink"
-                      className="text-gray-500 hover:text-gray-700"
-                    />
+              {commits.map((commit) => (
+                <div key={commit.id} className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-900 truncate mb-1">{commit.message}</p>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span className="font-mono">{commit.sha.substring(0, 7)}</span>
+                    <span>by {commit.author} • {formatTimeAgo(commit.timestamp)}</span>
                   </div>
                 </div>
               ))}
             </div>
-          )}
+          </div>
 
-          {/* Pull Requests Tab */}
-          {activeTab === 'pulls' && (
+          {/* Pull Requests */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pull Requests</h3>
             <div className="space-y-3">
-              {pullRequests?.map((pr) => (
-                <div key={pr?.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    pr?.status === 'open' ? 'bg-green-100 text-green-600' :
-                    pr?.status === 'merged'? 'bg-purple-100 text-purple-600' : 'bg-red-100 text-red-600'
-                  }`}>
-                    <Icon name="GitPullRequest" size={16} />
+              {pullRequests.map((pr) => (
+                <div key={pr.id} className="p-3 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full capitalize ${getPRStatusClasses(pr.status)}`}>
+                      {pr.status}
+                    </span>
+                    <span className="text-xs text-gray-500">#{pr.number}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 mb-1">{pr?.title}</div>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span>#{pr?.number}</span>
-                      <span>{pr?.author}</span>
-                      <span>{formatTimeAgo(pr?.createdAt)}</span>
-                      <span className={`px-2 py-1 rounded-full ${
-                        pr?.status === 'open' ? 'bg-green-100 text-green-600' :
-                        pr?.status === 'merged'? 'bg-purple-100 text-purple-600' : 'bg-red-100 text-red-600'
-                      }`}>
-                        {pr?.status}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1 text-xs text-gray-500">
-                      <Icon name="MessageSquare" size={12} />
-                      <span>{pr?.comments}</span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      iconName="ExternalLink"
-                      className="text-gray-500 hover:text-gray-700"
-                    />
+                  <p className="text-sm font-medium text-gray-900 mb-2">{pr.title}</p>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>by {pr.author}</span>
+                    <span>{formatTimeAgo(pr.createdAt)}</span>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-
-          {/* Issues Tab */}
-          {activeTab === 'issues' && (
-            <div className="space-y-3">
-              {[
-                {
-                  id: 1,
-                  title: "Fix responsive design on mobile devices",
-                  number: 23,
-                  author: "sarah-chen",
-                  createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-                  status: 'open',
-                  labels: ['bug', 'ui'],
-                  comments: 3
-                },
-                {
-                  id: 2,
-                  title: "Add user authentication system",
-                  number: 22,
-                  author: "mike-rodriguez",
-                  createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
-                  status: 'open',
-                  labels: ['feature', 'backend'],
-                  comments: 7
-                }
-              ]?.map((issue) => (
-                <div key={issue?.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Icon name="AlertCircle" size={16} className="text-green-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 mb-1">{issue?.title}</div>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mb-2">
-                      <span>#{issue?.number}</span>
-                      <span>{issue?.author}</span>
-                      <span>{formatTimeAgo(issue?.createdAt)}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {issue?.labels?.map((label) => (
-                        <span key={label} className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">
-                          {label}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1 text-xs text-gray-500">
-                      <Icon name="MessageSquare" size={12} />
-                      <span>{issue?.comments}</span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      iconName="ExternalLink"
-                      className="text-gray-500 hover:text-gray-700"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Quick Actions */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Last sync: {formatTimeAgo(repository?.lastSync)}
-              </div>
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  iconName="RefreshCw"
-                >
-                  Sync Now
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  iconName="ExternalLink"
-                >
-                  View on GitHub
-                </Button>
-              </div>
-            </div>
           </div>
-        </>
-      ) : (
-        /* No Repository Connected */
-        (<div className="text-center py-12">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Icon name="Github" size={32} className="text-gray-400" />
-          </div>
-          <h4 className="text-lg font-medium text-gray-900 mb-2">Connect Your Repository</h4>
-          <p className="text-gray-500 mb-6">
-            Link your GitHub repository to track commits, pull requests, and collaborate with your team.
-          </p>
-          <Button
-            variant="default"
-            iconName="Plus"
-            onClick={() => setShowConnectForm(true)}
-          >
-            Connect GitHub Repository
-          </Button>
-        </div>)
-      )}
+        </div>
+      </div>
     </div>
   );
 };

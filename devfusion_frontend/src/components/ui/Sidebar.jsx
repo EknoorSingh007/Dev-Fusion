@@ -11,16 +11,13 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // 1. Get both isLoggedIn AND user from the Redux store
   const { isLoggedIn, user } = useSelector((state) => state.auth);
 
-  // Handle Logout
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
   };
 
-  // Simplified navigationItems
   const navigationItems = [
     {
       category: 'Main',
@@ -33,7 +30,6 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
     },
   ];
 
-  // Simplified bottomItems, added Logout
   const bottomItems = [
     { name: 'Settings', path: '/settings', icon: 'Settings', description: 'Account preferences' },
     { name: 'Help & Support', path: '/help', icon: 'HelpCircle', description: 'Get assistance' },
@@ -42,7 +38,6 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
   const isActivePath = (path) => location?.pathname === path;
   const shouldShowExpanded = !isCollapsed || isHovered;
 
-  // Don't render the sidebar at all on login/register pages
   if (location.pathname === '/login' || location.pathname === '/register') {
     return null;
   }
@@ -57,15 +52,8 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
     >
       <div className="flex flex-col h-full">
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          {shouldShowExpanded && (
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-gray-600">
-                Active Projects: 3
-              </span>
-            </div>
-          )}
+        <div className="flex items-center justify-end p-4 border-b border-gray-200">
+          {/* 🟢 REMOVED "Active Projects" text */}
           {onToggleCollapse && (
             <Button
               variant="ghost"
@@ -203,15 +191,12 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
               </div>
               {shouldShowExpanded && (
                 <div className="flex-1 min-w-0">
-                  
-                  {/* 2. Use the user's name and title from Redux */}
                   <div className="text-sm font-medium text-gray-900 truncate">
                     {isLoggedIn ? (user?.name || 'Loading...') : 'Not Logged In'}
                   </div>
                   <div className="text-xs text-gray-500 truncate">
                     {isLoggedIn ? (user?.title || 'Student') : 'Please log in'}
                   </div>
-                  
                 </div>
               )}
             </div>

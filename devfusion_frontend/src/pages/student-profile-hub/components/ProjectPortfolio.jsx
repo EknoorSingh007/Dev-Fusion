@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
-import Image from '../../../components/AppImage';
+// 🟢 Removed 'Image' import
 import Button from '../../../components/ui/Button';
 
 const ProjectPortfolio = ({ projects, onViewProject, onAddProject }) => {
@@ -20,14 +20,8 @@ const ProjectPortfolio = ({ projects, onViewProject, onAddProject }) => {
     ? projects?.filter(p => p?.featured)
     : projects?.filter(p => p?.status === selectedFilter);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'completed': return 'bg-success text-white';
-      case 'ongoing': return 'bg-primary text-white';
-      case 'paused': return 'bg-warning text-white';
-      default: return 'bg-gray-400 text-white';
-    }
-  };
+  // (This function is no longer needed since the status badge was on the image)
+  // const getStatusColor = (status) => { ... };
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -41,6 +35,7 @@ const ProjectPortfolio = ({ projects, onViewProject, onAddProject }) => {
   return (
     <div className="bg-white rounded-xl shadow-brand border border-gray-200">
       <div className="p-6 border-b border-gray-200">
+        {/* (Header and Filter/View buttons are unchanged) */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Project Portfolio</h2>
@@ -79,7 +74,7 @@ const ProjectPortfolio = ({ projects, onViewProject, onAddProject }) => {
           </div>
         </div>
 
-        {/* Filter Tabs */}
+        {/* Filter Tabs (Unchanged) */}
         <div className="flex flex-wrap gap-2">
           {filters?.map((filter) => (
             <button
@@ -113,68 +108,16 @@ const ProjectPortfolio = ({ projects, onViewProject, onAddProject }) => {
                   viewMode === 'list' ? 'flex' : ''
                 }`}
               >
-                {/* Project Image */}
-                <div className={`relative overflow-hidden ${
-                  viewMode === 'list' ? 'w-32 h-24 flex-shrink-0' : 'h-48'
-                }`}>
-                  <Image
-                    src={project?.image}
-                    alt={project?.imageAlt}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  
-                  {/* Project Status */}
-                  <div className="absolute top-3 left-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project?.status)}`}>
-                      {project?.status}
-                    </span>
-                  </div>
-
-                  {/* Featured Badge */}
-                  {project?.featured && (
-                    <div className="absolute top-3 right-3">
-                      <div className="bg-accent text-white p-1.5 rounded-full">
-                        <Icon name="Star" size={14} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Quick Actions */}
-                  <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="flex space-x-2">
-                      {project?.githubUrl && (
-                        <a
-                          href={project?.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 bg-white/90 text-gray-700 rounded-full hover:bg-white transition-colors"
-                        >
-                          <Icon name="Github" size={14} />
-                        </a>
-                      )}
-                      {project?.liveUrl && (
-                        <a
-                          href={project?.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 bg-white/90 text-gray-700 rounded-full hover:bg-white transition-colors"
-                        >
-                          <Icon name="ExternalLink" size={14} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
+                {/* 🟢 Project Image Block REMOVED 🟢 */}
+                
                 {/* Project Content */}
-                <div className="p-4 flex-1">
+                <div className="p-4 flex-1 w-full"> {/* 🟢 Added w-full */}
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
                       {project?.title}
                     </h3>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(project?.role)}`}>
-                      {project?.role}
+                      {project?.role || 'Contributor'}
                     </span>
                   </div>
 
@@ -213,24 +156,21 @@ const ProjectPortfolio = ({ projects, onViewProject, onAddProject }) => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <Icon name="Star" size={14} />
-                      <span>{project?.rating}</span>
+                      <span>{project?.rating || 'N/A'}</span>
                     </div>
                   </div>
 
                   {/* Team Avatars */}
                   <div className="flex items-center justify-between">
                     <div className="flex -space-x-2">
+                      {/* 🟢 Replaced <img> with placeholder <div> */}
                       {project?.teamMembers?.slice(0, 3)?.map((member, index) => (
                         <div
                           key={index}
-                          className="w-6 h-6 rounded-full border-2 border-white overflow-hidden"
+                          className="w-6 h-6 rounded-full border-2 border-white overflow-hidden bg-gray-200 flex items-center justify-center"
                           title={member?.name}
                         >
-                          <img
-                            src={member?.avatar}
-                            alt={member?.avatarAlt}
-                            className="w-full h-full object-cover"
-                          />
+                          <Icon name="User" size={12} className="text-gray-500" />
                         </div>
                       ))}
                       {project?.teamMembers?.length > 3 && (

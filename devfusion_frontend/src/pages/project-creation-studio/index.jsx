@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // 🟢 Import axios
-import { useSelector } from 'react-redux'; // 🟢 Import useSelector
-import Header from '../../components/ui/Header';
-import Sidebar from '../../components/ui/Sidebar';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+// 🟢 1. REMOVED Header import
+import Sidebar from '../../components/ui/Sidebar'; // 🟢 KEPT Sidebar import
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import StepIndicator from './components/StepIndicator';
@@ -17,15 +17,13 @@ import ProjectPreview from './components/ProjectPreview';
 const ProjectCreationStudio = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);// 🟢 KEPT local sidebar state
   const [showTemplates, setShowTemplates] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
   
-  // 🟢 Get the logged-in user's profile data from Redux
   const userProfile = useSelector((state) => state.auth.user);
 
   const [formData, setFormData] = useState({
-    // Project Basics
     title: '',
     type: '',
     complexity: '',
@@ -33,15 +31,11 @@ const ProjectCreationStudio = () => {
     description: '',
     isOpenForCollaboration: true,
     seekingMentorship: false,
-    
-    // Team Requirements
     teamSize: '',
     timeCommitment: '',
     crossInstitutional: false,
     remoteCollaboration: true,
     skillRequirements: [],
-    
-    // Technology Stack
     frontendTech: [],
     backendTech: [],
     database: [],
@@ -54,8 +48,6 @@ const ProjectCreationStudio = () => {
     cicdSetup: false,
     codeQuality: true,
     documentation: true,
-    
-    // Collaboration Setup
     communicationTool: '',
     projectManagementTool: '',
     fileSharingTool: [],
@@ -176,6 +168,8 @@ const ProjectCreationStudio = () => {
         if (!formData?.meetingFrequency) newErrors.meetingFrequency = 'Meeting frequency is required';
         if (!formData?.timezone) newErrors.timezone = 'Timezone is required';
         break;
+      default:
+        break;
     }
     
     setErrors(newErrors);
@@ -200,6 +194,8 @@ const ProjectCreationStudio = () => {
 
   const handleSelectTemplate = (template) => {
     const templateData = {
+      title: template.title, // 🟢 Also apply title from template
+      description: template.features.join('\n'), // 🟢 Apply features as description
       type: template?.id,
       complexity: template?.complexity?.toLowerCase(),
       frontendTech: template?.technologies?.filter(tech => 
@@ -229,16 +225,13 @@ const ProjectCreationStudio = () => {
     setCurrentStep(0);
   };
 
-  // 🟢 UPDATED: handlePublish function
   const handlePublish = async () => {
-    // Validate all steps before publishing
     const step0Valid = validateStep(0);
     const step1Valid = validateStep(1);
     const step2Valid = validateStep(2);
     const step3Valid = validateStep(3);
 
     if (!step0Valid || !step1Valid || !step2Valid || !step3Valid) {
-        // If validation fails, jump to the first invalid step
         if (!step0Valid) { setCurrentStep(0); return; }
         if (!step1Valid) { setCurrentStep(1); return; }
         if (!step2Valid) { setCurrentStep(2); return; }
@@ -249,7 +242,16 @@ const ProjectCreationStudio = () => {
     setIsPublishing(true);
     const token = localStorage.getItem('authToken');
 
-    // 1. Map frontend state to backend model
+    const allTechNames = [
+      ...formData.frontendTech,
+      ...formData.backendTech,
+      ...formData.database,
+      ...formData.cloudPlatform,
+      ...formData.mobileTech,
+      ...formData.aiMlTech,
+      ...formData.otherTechnologies.map(t => t.label) 
+    ];
+
     const payload = {
       title: formData.title,
       description: formData.description,
@@ -264,26 +266,20 @@ const ProjectCreationStudio = () => {
       remoteCollaboration: formData.remoteCollaboration,
       communicationTool: formData.communicationTool,
       projectManagementTool: formData.projectManagementTool,
-      fileSharingTool: formData.fileSharingTool.join(','), // Join array for CharField
+      fileSharingTool: formData.fileSharingTool.join(','), 
       meetingFrequency: formData.meetingFrequency,
       timezone: formData.timezone,
       repositoryName: formData.repositoryName,
-      
-      // 2. Map skill requirements
       team_requirements: formData.skillRequirements.map(req => ({
-        skill_name: req.skill, // This assumes 'skill' is the category/name string
+        skill_name: req.skill, 
         experience: req.experience,
         is_required: req.required,
         description: req.description
       })),
-      
-      // TODO: Map technology_ids (requires fetching skills from API first)
-      // For now, we are skipping this. We'd need to fetch /api/skills/
-      // and map the names (React, Python) to their IDs.
+      technology_names: allTechNames 
     };
 
     try {
-      // 3. Make the real API call
       const response = await axios.post(
         'http://127.0.0.1:8000/api/projects/', 
         payload, 
@@ -295,7 +291,6 @@ const ProjectCreationStudio = () => {
         }
       );
       
-      // 4. Navigate to the profile page to see the new project
       navigate('/student-profile-hub');
 
     } catch (error) {
@@ -353,7 +348,6 @@ const ProjectCreationStudio = () => {
         return (
           <ProjectPreview
             formData={formData}
-            // 🟢 Pass the real user data to the preview
             creator={userProfile} 
             onEdit={setCurrentStep}
             onPublish={handlePublish}
@@ -371,11 +365,12 @@ const ProjectCreationStudio = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      {/* 🟢 REMOVED duplicate <Header /> */}
       <Sidebar 
         isCollapsed={sidebarCollapsed} 
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
+      {/* 🟢 Corrected main tag to respect global header and local sidebar */}
       <main className={`pt-16 transition-all duration-300 ${
         sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
       }`}>

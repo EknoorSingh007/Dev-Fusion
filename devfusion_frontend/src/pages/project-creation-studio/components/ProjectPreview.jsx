@@ -1,13 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // 🟢 Import Link
+import { Link } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 
-// 🟢 1. Accept 'creator' as a prop
 const ProjectPreview = ({ formData, onEdit, onPublish, isPublishing, creator }) => {
   
-  // (This helper function is unchanged)
   const getComplexityColor = (complexity) => {
     const colors = {
       beginner: 'bg-green-100 text-green-800',
@@ -18,7 +16,6 @@ const ProjectPreview = ({ formData, onEdit, onPublish, isPublishing, creator }) 
     return colors?.[complexity] || 'bg-gray-100 text-gray-800';
   };
 
-  // (This helper function is unchanged)
   const getTypeIcon = (type) => {
     const icons = {
       'web-app': 'Globe',
@@ -35,13 +32,10 @@ const ProjectPreview = ({ formData, onEdit, onPublish, isPublishing, creator }) 
     return icons?.[type] || 'Code';
   };
   
-  // (This helper function is unchanged)
   const formatTechnologies = (techArray) => {
     if (!techArray || techArray?.length === 0) return 'Not specified';
     return techArray?.slice(0, 3)?.join(', ') + (techArray?.length > 3 ? ` +${techArray?.length - 3} more` : '');
   };
-
-  // 🟢 2. REMOVED the mockCreatorData object
 
   return (
     <div className="space-y-6">
@@ -183,7 +177,6 @@ const ProjectPreview = ({ formData, onEdit, onPublish, isPublishing, creator }) 
         {/* Project Creator (NOW USES REAL DATA) */}
         <div className="border-t border-gray-200 pt-6">
           <h4 className="text-sm font-semibold text-gray-900 mb-3">Project Creator</h4>
-          {/* 🟢 3. Use creator prop (passed from parent) */}
           {creator ? (
             <div className="flex items-center space-x-4">
               <Image
@@ -195,6 +188,7 @@ const ProjectPreview = ({ formData, onEdit, onPublish, isPublishing, creator }) 
                 <div className="flex items-center space-x-2">
                   <h5 className="font-medium text-gray-900">{creator?.name}</h5>
                 </div>
+                {/* 🟢 SYNTAX ERROR FIXED HERE */}
                 <p className="text-sm text-gray-600">
                   {creator?.title || 'Student'} • {creator?.university || 'DevFusion Member'}
                 </p>
@@ -260,3 +254,4 @@ const ProjectPreview = ({ formData, onEdit, onPublish, isPublishing, creator }) 
 };
 
 export default ProjectPreview;
+

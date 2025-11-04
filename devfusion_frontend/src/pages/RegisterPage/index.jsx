@@ -159,9 +159,19 @@ function RegisterPage() {
               placeholder="••••••••"
               icon={Lock}
               error={errors.password}
+              // 🟢 UPDATED VALIDATION RULES 🟢
               register={register("password", { 
                 required: "Password is required.",
-                minLength: { value: 8, message: "Password must be at least 8 characters." }
+                validate: {
+                  hasUpper: value => 
+                    /[A-Z]/.test(value) || "Must include one uppercase letter.",
+                  hasNumber: value => 
+                    /[0-9]/.test(value) || "Must include one number.",
+                  hasSpecial: value => 
+                    /[!@#$%^&*]/.test(value) || "Must include one special character (!@#$%^&*).",
+                  hasLength: value => 
+                    value.length >= 8 || "Must be at least 8 characters long."
+                }
               })}
               disabled={loading}
             />
