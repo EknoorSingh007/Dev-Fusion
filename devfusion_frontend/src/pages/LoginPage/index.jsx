@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { User, Lock, Loader2, ArrowRight } from 'lucide-react';
-// 🟢 1. Import Redux hooks and actions
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../redux/authSlice'; 
 
@@ -12,10 +11,8 @@ function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
-  // 🟢 2. Get the dispatch function
   const dispatch = useDispatch();
 
-  // --- Submission Handler (Updated) ---
   const onSubmit = async (data) => {
     setLoading(true);
     setLoginError('');
@@ -30,10 +27,8 @@ function LoginPage() {
 
       const { access, refresh } = response.data;
       
-      // 🟢 3. Dispatch the loginSuccess action with the tokens
       dispatch(loginSuccess({ access, refresh }));
 
-      // Navigate to the profile page
       navigate('/student-profile-hub'); 
 
     } catch (error) {
@@ -44,7 +39,7 @@ function LoginPage() {
     }
   };
 
-  // ... (The rest of your JSX return statement is unchanged) ...
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-[--color-background]">
       <div 
